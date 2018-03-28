@@ -3,18 +3,13 @@
 import rxwx from '../../utils/RxWX.js'
 const app = getApp()
 
-Page({
+let page = {
   data: {
     motto: 'Hello World',
     userInfo: {},
     hasUserInfo: false
   },
-  //事件处理函数
-  bindViewTap: function () {
-    rxwx.navigateTo({
-      url: '../logs/logs',
-    }).subscribe()
-  },
+
   onLoad: function () {
     if (app.globalData.userInfo) {
       this.setData({
@@ -23,7 +18,7 @@ Page({
       })
     } else {
       rxwx.canIUse('button.open-type.getUserInfo')
-        .do(canIUse => this.setData({canIUse}))
+        .do(canIUse => this.setData({ canIUse }))
         .switchMap(userInfoCached => userInfoCached ? app.userInfoReady() : rxwx.getUserInfo())
         .subscribe(res => {
           this.setData({
@@ -40,4 +35,13 @@ Page({
       hasUserInfo: true
     })
   }
-})
+}
+
+//事件处理函数
+rxwx.fromEvent(page, 'bindViewTap')
+  .switchMap(() => rxwx.navigateTo({
+    url: '../logs/logs',
+  }))
+  .subscribe()
+
+Page(page)
